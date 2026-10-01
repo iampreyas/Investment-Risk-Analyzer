@@ -1,19 +1,35 @@
 #include<iostream.h>
 class investment
 {
-    int id;
-    float amount;
+    protected:
+        int id;
+        char name[10];
+        float amount,rate;
+    public:
     void input()
     {
         cout<<"Enter Investment ID:";
         cin>>id;
+        cout<<"Enter Investment Name:"
+        cin>>name;
         cout<<"Enter Amount:";
         cin>>amount;
+        cout<<"Enter Expected Return Rate (%):";
+        cin>>rate;
     }
     void display()
     {
-        cout<<"\Investment ID:"<<id;
+        cout<<"\nInvestment ID:"<<id;
+        cout<<"\nName:"<<name;
         cout<<"\nAmount: Rs."<<amount;
+        cout<<"\nRate:"<<rate<<"%";
+    }
+    int display()
+    {
+        cout<<"\nID :"<<id;
+        cout<<"\nName :"<<name;
+        cout<<"\nAmount :Rs. "<<amount;
+        cout<<"\nRate :"<<rate<<" %";
     }
 };
 int main()
@@ -22,5 +38,6 @@ int main()
     investment inv;
     inv.input();
     inv.display();
+    inv.calculateReturn();
     return 0;
 }
