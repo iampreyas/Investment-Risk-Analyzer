@@ -31,6 +31,14 @@ class investment
         cout<<"\nAmount :Rs. "<<amount;
         cout<<"\nRate :"<<rate<<" %";
     }
+    int getID()
+    {
+        return id;
+    }
+    float getAmount()
+    {
+        return amount;
+    }
 };
 int main()
 {
