@@ -132,6 +132,42 @@ class forex : public investment
         cout<<"\nRisk Level : High";
     }
 };
+void addInvestment(investment inv[],int &n)
+{
+    inv[n].input();
+    inv[n].save();
+    n++;
+    cout<<"\nInvestment Added Successfully!";
+}
+void displayInvestment(investment inv[],int n)
+{
+    int i;
+    if(n==0)
+    {
+        cout<<"\nNo Investment Found!";
+        return;
+    }
+    for(i=0;i<n;i++)
+    {
+        cout<<"\n---INVESTMENT "<<i+1<<"---";
+        inv[i].display();
+    }
+}
+void investMore(investment inv[],int n)
+{
+    int id,i;
+    cout<<"\nEnter Investment ID :"
+    cin>>id;
+    for(i=0;i<n;i++)
+    {
+        if(inv[i].getID()==id)
+        {
+            inv[i].addAmount();
+            return;
+        }
+    }
+    cout<<"\nInvestment Not Found!";
+}
 int main()
 {
     clrscr();
