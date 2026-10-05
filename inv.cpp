@@ -156,7 +156,7 @@ void displayInvestment(investment inv[],int n)
 void investMore(investment inv[],int n)
 {
     int id,i;
-    cout<<"\nEnter Investment ID :"
+    cout<<"\nEnter Investment ID :";
     cin>>id;
     for(i=0;i<n;i++)
     {
@@ -167,6 +167,53 @@ void investMore(investment inv[],int n)
         }
     }
     cout<<"\nInvestment Not Found!";
+}
+void calculateReturn(investment inv[],int n)
+{
+    int id;
+    cout<<"\nEnter Investment ID:";
+    cin>>id;
+    for(int i=0;o<n;i++)
+    {
+        if(inv[i].getID()==id)
+        {
+            inv[i].returnAmount();
+            return;
+        }
+    }
+    cout<<"\nInvestment Not Found";
+}
+void analyzeRisk(investment inv[],int n)
+{
+    int id;
+    cout<<"\nEnter Investment ID :";
+    cin>>id;
+    for(int i=0;i<n;i++)
+    {
+        if(inv[i].getID()==id)
+        {
+            cout<<"\n---RISK ANALYSIS---";
+            if(inv[i].getAmount()>100000)
+                cout<<"\nInvestment Amount: High";
+            else
+                cout<<"\nInvestment Amount : Normal";
+            cout<<"\nExpected Return : "<<inv[i].getAmount() * 0.10;
+            cout<<"\nRisk Level : Medium";
+            return;
+        }
+    }
+    cout<<"\nInvestment Not Found!";
+}
+void portfolioSummary(investment inv[],int n)
+{
+    float total=0;
+    for(int i=0;i<n;i++)
+    {
+        total=tatal + inv[i].getAmount();
+    }
+    cout<<"\n---PORTFOLIO SUMMARY---";
+    cout<<"\nTotal Investment : "<<n;
+    cout<<"\nTotal Amount : Rs. "<<total;
 }
 int main()
 {
