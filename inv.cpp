@@ -1,4 +1,6 @@
-#include<iostream.h>
+#include<iostream>
+#include<fstream>
+using namespace std;
 class investment
 {
     protected:
@@ -10,7 +12,7 @@ class investment
     {
         cout<<"Enter Investment ID:";
         cin>>id;
-        cout<<"Enter Investment Name:"
+        cout<<"Enter Investment Name:";
         cin>>name;
         cout<<"Enter Amount:";
         cin>>amount;
@@ -24,13 +26,6 @@ class investment
         cout<<"\nAmount: Rs."<<amount;
         cout<<"\nRate:"<<rate<<"%";
     }
-    int display()
-    {
-        cout<<"\nID :"<<id;
-        cout<<"\nName :"<<name;
-        cout<<"\nAmount :Rs. "<<amount;
-        cout<<"\nRate :"<<rate<<" %";
-    }
     int getID()
     {
         return id;
@@ -42,7 +37,7 @@ class investment
     void addAmount()
     {
         float money;
-        cout<<"\nEnter Amount to Invest More : "
+        cout<<"\nEnter Amount to Invest More : ";
         cin>>money;
         amount = amount+money;
         cout<<"\nInvestment Updated Successfully!";
@@ -173,7 +168,7 @@ void calculateReturn(investment inv[],int n)
     int id;
     cout<<"\nEnter Investment ID:";
     cin>>id;
-    for(int i=0;o<n;i++)
+    for(int i=0;i<n;i++)
     {
         if(inv[i].getID()==id)
         {
@@ -204,23 +199,44 @@ void analyzeRisk(investment inv[],int n)
     }
     cout<<"\nInvestment Not Found!";
 }
-void portfolioSummary(investment inv[],int n)
-{
-    float total=0;
-    for(int i=0;i<n;i++)
-    {
-        total=tatal + inv[i].getAmount();
-    }
-    cout<<"\n---PORTFOLIO SUMMARY---";
-    cout<<"\nTotal Investment : "<<n;
-    cout<<"\nTotal Amount : Rs. "<<total;
-}
 int main()
 {
-    clrscr();
-    investment inv;
-    inv.input();
-    inv.display();
-    inv.calculateReturn();
+    investment inv[20];
+    int n=0,ch;
+    while(ch!=6)
+    {
+        cout<<"\n---INVESTMENT RISK ANALYZER---";
+        cout<<"\n1. Add Investment";
+        cout<<"\n2. Display Investments";
+        cout<<"\n3. Invest More";
+        cout<<"\n4. Calculate Return";
+        cout<<"\n5. Analyze Risk";
+        cout<<"\n6. Exit";
+        cout<<"\nEnter Choice :";
+        cin>>ch;
+        switch(ch)
+        {
+            case 1:
+                addInvestment(inv,n);
+                break;
+            case 2:
+                displayInvestment(inv,n);
+                break;
+            case 3:
+                investMore(inv,n);
+                break;
+            case 4:
+                calculateReturn(inv,n);
+                break;
+            case 5:
+                analyzeRisk(inv,n);
+                break;
+            case 6:
+                cout<<"\nThank You!";
+                break;
+            default:
+                cout<<"\nInvalid Choice";
+        }
+    }
     return 0;
 }
