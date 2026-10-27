@@ -67,6 +67,11 @@ if os.path.exists(DATA_FILE):
     st.markdown("Saved Investments")
     saved_df=pd.read_csv(DATA_FILE)
     st.dataframe(saved_df,use_container_width=True)
+    if not saved_df.empty:
+        st.markdown("Asset Allocation Breakdown")
+        fig_pie=px.pie(saved_df,values="Amount",names="Name",title="Portfolio Asset Allocation by Amount",hole=0.4)
+        fig_pie.update_traces(textinfo='percent+label')
+        st.plotly_chart(fig_pie,use_container_width=True)
     col_del1,col_del2=st.columns(2)
     with col_del1:
         if not saved_df.empty:
