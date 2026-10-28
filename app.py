@@ -64,8 +64,20 @@ if analyze_clicked:
     fig = px.line(df_growth, x="Year", y="Portfolio Value",title=f"Compounded Return Projection ({inv_name})", markers=True)
     st.plotly_chart(fig, use_container_width=True)
 if os.path.exists(DATA_FILE):
-    st.markdown("Saved Investments")
+    st.markdown("---")
+    st.markdown("Portfolio Summary & Metrics")
     saved_df=pd.read_csv(DATA_FILE)
+    if not saved_df.empty:
+        total_invested=saved_df["Amount"].sum()
+        avg_rate=saved_df["Rate (%)"].mean()
+        col_m1,col_m2,col_m3=st.columns(3)
+        with col_m1:
+            st.metric(label="Total Invested Amount",value=f"Rs. {total_invested:,.2f}")
+        with col_m2:
+            st.metric(label="Average Return Rate",value=f"{avg_rate:.2f}%")
+        with col_m3:
+            st.metric(label="Total Saved Assets",value=len(saved_df))
+    st.markdown("Saved Investments")
     st.dataframe(saved_df,use_container_width=True)
     if not saved_df.empty:
         st.markdown("Asset Allocation Breakdown")
