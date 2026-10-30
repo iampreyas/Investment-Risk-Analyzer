@@ -63,6 +63,24 @@ if analyze_clicked:
         st.warning("High Capital Allocation")
     else:
         st.success("Normal Capital Allocation")
+    risk_score = volatility * 2.5
+    if amount > 500000:
+        risk_score += 25
+    elif amount > 100000:
+        risk_score += 15
+    if years > 7:
+        risk_score += 10
+    elif years > 5:
+        risk_score += 5
+    risk_score=min(100,risk_score)
+    st.markdown("Risk Score")
+    st.progress(int(risk_score)/100)
+    if risk_score >= 70:
+        st.error(f"Risk Score: {risk_score:.1f}/100 -> High Risk")
+    elif risk_score >= 40:
+        st.warning(f"Risk Score: {risk_score:.1f}/100 -> Medium Risk")
+    else:
+        st.warning(f"Risk Score: {risk_score:.1f}/100 -> low Risk")
     st.markdown("Project Growth Over Time")
     growth_data = []
     current_val = amount
