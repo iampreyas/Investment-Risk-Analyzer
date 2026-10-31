@@ -52,6 +52,29 @@ if analyze_clicked:
     profit = total - amount
     st.success(f"Expected Return Amount: Rs. {profit:,.2f}")
     st.info(f"Total Value After Return: Rs. {total:,.2f}")
+    best_rate=rate + volatility
+    worst_rate=max(0,rate - volatility)
+    best_total=amount * ((1 + best_rate/100) ** years)
+    worst_total=amount * ((1 + worst_rate/100) ** years)
+    best_profit = best_total - amount
+    worst_profit = worst_total - amount
+    st.markdown("Scenario Analysis")
+    col_s1,col_s2,col_s3=st.columns(3)
+    with col_s1:
+        st.success("Best Case")
+        st.write(f"**Rate:** {best_rate:.1f}%")
+        st.write(f"**Profit:** Rs. {best_profit:,.2f}")
+        st.write(f"**Total:** Rs. {best_total:,.2f}")
+    with col_s2:
+        st.info("Expected Case")
+        st.write(f"**Rate:** {rate:.1f}%")
+        st.write(f"**Profit:** Rs. {profit:,.2f}")
+        st.write(f"**Total:** Rs. {total:,.2f}")
+    with col_s3:
+        st.error("Worst Case")
+        st.write(f"**Rate:** {worst_rate:.1f}%")
+        st.write(f"**Profit:** Rs. {worst_profit:,.2f}")
+        st.write(f"**Total:** Rs. {worst_total:,.2f}")
     st.markdown("Risk Level")
     if volatility >= 20:
         st.error("High Risk")
