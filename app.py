@@ -105,14 +105,24 @@ if analyze_clicked:
     else:
         st.warning(f"Risk Score: {risk_score:.1f}/100 -> low Risk")
     st.markdown("Project Growth Over Time")
+    best_rate=rate + volatility
+    worst_rate=max(0,rate - volatility)
     growth_data = []
-    current_val = amount
+    curr_expexted=amount
+    curr_best=amount
+    curr_worst=amount
     for y in range(1,years + 1):
-        current_val += (current_val * rate) / 100
-        growth_data.append({"Year":f"Year {y}","Portfolio Value": current_val})
+        curr_expexted += (curr_expexted * rate) / 100
+        curr_best += (curr_best * best_rate) / 100
+        curr_worst += (curr_worst * worst_rate) / 100
+        growth_data.append({"Year": f"Year {y}","Expected": curr_expexted,"Best Case":curr_best,"Worst Case":curr_worst})
     df_growth = pd.DataFrame(growth_data)
-    fig = px.line(df_growth, x="Year", y="Portfolio Value",title=f"Compounded Return Projection ({inv_name})", markers=True)
-    st.plotly_chart(fig, use_container_width=True)
+    fig=px.line(
+        df_growth,
+        x="Year",y=["Expected","Best Case","Worst Case"],title=f"Growth Projection:{inv_name}",markers=True,
+    )
+    fig.update_layout(yaxis_title="Portfolio Value (Rs.)")
+    st.plotly_chart(fig,use_container_width=True)
 if os.path.exists(DATA_FILE):
     st.markdown("---")
     st.markdown("Portfolio Summary & Metrics")
