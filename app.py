@@ -143,6 +143,14 @@ if os.path.exists(DATA_FILE):
     st.markdown("Saved Investments")
     st.dataframe(saved_df,use_container_width=True)
     if not saved_df.empty:
+        csv=saved_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="Download Portfolio as CSV",
+            data=csv,
+            file_name="my_portfolio.csv",
+            mime="text/csv"
+        )
+    if not saved_df.empty:
         st.markdown("Asset Allocation Breakdown")
         fig_pie=px.pie(saved_df,values="Amount",names="Name",title="Portfolio Asset Allocation by Amount",hole=0.4)
         fig_pie.update_traces(textinfo='percent+label')
