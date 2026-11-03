@@ -150,6 +150,46 @@ if os.path.exists(DATA_FILE):
             file_name="my_portfolio.csv",
             mime="text/csv"
         )
+    st.markdown("Compare Two Investments")
+    if not saved_df.empty and len(saved_df) >= 2:
+        col_c1,col_c2=st.columns(2)
+        with col_c1:
+            inv1=st.selectbox("Select First Investment",saved_df["Name"].unique(),key="comp1")
+        with col_c2:
+            inv2=st.selectbox("Select Second Investment",saved_df["Name"].unique(),key="comp2")
+        if inv1 != inv2:
+            row1=saved_df[saved_df["Name"]==inv1].iloc[0]
+            row2=saved_df[saved_df["Name"]==inv2].iloc[0]
+            def get_final_value(row):
+                return row["Amount"] * ((1 + row["Rate (%)"]/100) ** row["Years"])
+            val1=get_final_value(row1)
+            val2=get_final_value(row2)
+            st.markdown("Comparison Result")
+            comp_col1,comp_col2=st.columns(2)
+            with comp_col1:
+                st.info(f"**{inv1}**")
+                st.write(f"Amount: Rs. {row1['Amount']:,.0f}")
+                st.write(f"Rate: {row1['Rate (%)']}%")
+                st.write(f"Years: {row1['Years']}")
+                st.write(f"Volatility: {row1['Volatility (%)']}%")
+                st.write(f"Final Value: Rs. {val1:,.2f}")
+            with comp_col2:
+                st.info(f"**{inv2}**")
+                st.write(f"Amount: Rs. {row2['Amount']:,.0f}")
+                st.write(f"Rate: {row2['Rate (%)']}%")
+                st.write(f"Years: {row2['Years']}")
+                st.write(f"Volatility: {row2['Volatility (%)']}%")
+                st.write(f"Final Value: Rs. {val2:,.2f}")
+            if val1 > val2:
+                st.success(f"Winner based on Final Value: **{inv1}**")
+            elif val2 > val1:
+                st.success(f"Winner based on Final Value: **{inv2}**")
+            else:
+                st.warning("Both have same Final Value")
+        else:
+            st.warning("Please select two different investments")
+    else:
+        st.info("At least 2 investments required for comparison")
     if not saved_df.empty:
         st.markdown("Asset Allocation Breakdown")
         fig_pie=px.pie(saved_df,values="Amount",names="Name",title="Portfolio Asset Allocation by Amount",hole=0.4)
