@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd 
 import plotly.express as px
 import os
+import numpy as np
 st.title ("Investment Risk Analyzer")
 st.subheader("Calculate Return & Analyze Risk")
 DATA_FILE="investments.csv"
@@ -104,6 +105,29 @@ if analyze_clicked:
         st.warning(f"Risk Score: {risk_score:.1f}/100 -> Medium Risk")
     else:
         st.warning(f"Risk Score: {risk_score:.1f}/100 -> low Risk")
+    st.markdown("Posible Future Results")
+    np.random.seed(42)
+    simulations=1000
+    final_values=[]
+    for i in range(simulations):
+        random_return=np.random.normal(loc=rate,scale=volatility)
+        random_return=max(0,random_return)
+        final_val= amount * ((1 + random_return/100) ** years)
+        final_values.append(final_val)
+    final_values=np.array(final_values)
+    avg_sim=np.mean(final_values)
+    best_5=np.percentile(final_values,95)
+    worst_5=np.percentile(final_values,5)
+    prob_loss=(np.sum(final_values<amount)/simulations) * 100
+    col_mc1,col_mc2,col_mc3,col_mc4=st.columns(4)
+    with col_mc1:
+        st.metric("Average Outcome",f"Rs. {avg_sim:,.0f}")
+    with col_mc2:
+        st.metric("Best 5% Case",f"Rs. {best_5:,.0f}")
+    with col_mc3:
+        st.metric("Worst 5% Case",f"Rs. {worst_5:,.0f}")
+    with col_mc4:
+        st.metric("Chance of Loss",f"{prob_loss:.1f}%")
     st.markdown("Project Growth Over Time")
     best_rate=rate + volatility
     worst_rate=max(0,rate - volatility)
