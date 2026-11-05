@@ -219,6 +219,22 @@ if os.path.exists(DATA_FILE):
         fig_pie=px.pie(saved_df,values="Amount",names="Name",title="Portfolio Asset Allocation by Amount",hole=0.4)
         fig_pie.update_traces(textinfo='percent+label')
         st.plotly_chart(fig_pie,use_container_width=True)
+        st.markdown("Risk vs Return Analysis")
+        fig_risk=px.scatter(
+            saved_df,
+            x="Volatility (%)",
+            y="Rate (%)",
+            size="Amount",
+            color="Name",
+            hover_data=["ID","Amount"],
+            title="Investment Risk vs Expected Return",
+            size_max=50
+        )
+        fig_risk.update_layout(
+            xaxis_title="Risk (Volatility %)",
+            yaxis_title="Expected Return (%)"
+        )
+        st.plotly_chart(fig_risk,use_container_width=True)
     col_del1,col_del2=st.columns(2)
     with col_del1:
         if not saved_df.empty:
