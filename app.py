@@ -128,6 +128,14 @@ if analyze_clicked:
         st.metric("Worst 5% Case",f"Rs. {worst_5:,.0f}")
     with col_mc4:
         st.metric("Chance of Loss",f"{prob_loss:.1f}%")
+    fig_hist=px.histogram(
+        final_values,
+        nbins=30,
+        title="Distribution of Possible Outcomes",
+        labels={"Value":"Final Portfolio Value (Rs.)","count":"Number of Times"}
+    )
+    fig_hist.update_layout(showlegend=False)
+    st.plotly_chart(fig_hist,use_container_width=True)
     st.markdown("Project Growth Over Time")
     best_rate=rate + volatility
     worst_rate=max(0,rate - volatility)
