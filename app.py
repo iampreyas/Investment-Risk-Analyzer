@@ -31,6 +31,7 @@ amount=st.number_input("Investment Amount (Rs.)",min_value=0.0,step=5000.0,key='
 rate=st.number_input("Expected Return Rate (%)",min_value=0.0,step=0.5,key='rate')
 years = st.slider("Investment Horizon (Years)",min_value=1,max_value=10,key='years')
 volatility=st.number_input("Expected Volatility / Risk (%)",min_value=0.0,step=0.5,key='volatility')
+target=st.number_input("Enter Targeted Amount (Rs.)",min_value=0.0,step=10000.0,value=amount*2)
 col1,col2,col3=st.columns(3)
 with col1:
     analyze_clicked = st.button("Analyze Investment")
@@ -136,6 +137,16 @@ if analyze_clicked:
     )
     fig_hist.update_layout(showlegend=False)
     st.plotly_chart(fig_hist,use_container_width=True)
+    st.markdown("Target Amount Checker")
+    if target > 0:
+        prob_target=(np.sum(final_values >= target) /simulations) * 100
+        st.metric("Chances of reaching the target",f"{prob_target:.1f}%")
+        if prob_target >= 70:
+            st.success("Good Chance")
+        elif prob_target >= 40:
+            st.warning("Medium Chance")
+        else:
+            st.error("Hard Chance")
     st.markdown("Project Growth Over Time")
     best_rate=rate + volatility
     worst_rate=max(0,rate - volatility)
