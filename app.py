@@ -3,9 +3,24 @@ import pandas as pd
 import plotly.express as px
 import os
 import numpy as np
+import sqlite3
 st.title ("Investment Risk Analyzer")
 st.subheader("Calculate Return & Analyze Risk")
 DATA_FILE="investments.csv"
+DB_FILE="investments.db"
+def init_db():
+    conn=sqlite3.connect(DB_FILE)
+    c=conn.cursor()
+    c.execute(CREATE TABLE IF NOT EXISTS investments(
+        ID INTEGER,
+        Name TEXT,
+        Amount REAL,
+        Years INTEGER,
+        Volatility REAL)
+    )
+    conn.commit()
+    conn.close()
+init_db()
 if 'inv_id' not in st.session_state:
     st.session_state.inv_id=1
 if 'inv_name' not in st.session_state:
