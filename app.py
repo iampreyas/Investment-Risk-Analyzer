@@ -11,13 +11,15 @@ DB_FILE="investments.db"
 def init_db():
     conn=sqlite3.connect(DB_FILE)
     c=conn.cursor()
-    c.execute(CREATE TABLE IF NOT EXISTS investments(
+    c.execute('''
+    CREATE TABLE IF NOT EXISTS investments(
         ID INTEGER,
         Name TEXT,
         Amount REAL,
         Years INTEGER,
-        Volatility REAL)
-    )
+        Volatility REAL
+        )
+    ''')
     conn.commit()
     conn.close()
 init_db()
@@ -58,11 +60,17 @@ if save_clicked:
     if inv_name.strip()=="":
         st.error("Please enter a valid Investment Name before saving.")
     else:
-        new_data=pd.DataFrame([{"ID":inv_id,"Name":inv_name,"Amount":amount,"Rate (%)":rate,"Years":years,"Volatility (%)": volatility}])
-        if os.path.exists(DATA_FILE):
-            new_data.to_csv(DATA_FILE,mode='a',header=False,index=False)
-        else:
-            new_data.to_csv(DATA_FILE,mode='w',header=True,index=False)
+        conn=sqlite3.connect(DB_FILE)
+        c=conn.cursor()
+        c.execute(
+            '''
+            INSERT INTO investments (ID, Name, Amount, Rate, Years, Volatility)
+            VALUES (?, ?, ?, ?, ?, ?)
+            ''',
+            (inv_id,inv_name,amount,rate,years,volatility)
+        )
+        conn.commit()
+        conn.close()
         st.success(f"Investment '{inv_name}' saved successfully to {DATA_FILE}!")
 if analyze_clicked:
     total= amount * ((1 + rate/100) ** years)
@@ -181,10 +189,9 @@ if analyze_clicked:
     )
     fig.update_layout(yaxis_title="Portfolio Value (Rs.)")
     st.plotly_chart(fig,use_container_width=True)
-if os.path.exists(DATA_FILE):
-    st.markdown("---")
-    st.markdown("Portfolio Summary & Metrics")
-    saved_df=pd.read_csv(DATA_FILE)
+    conn=sqlite3.connect(DB_FILE)
+    saved_df=pd.read_sql_query("SELECT * FROOM investments",conn)
+    conn.close()
     if not saved_df.empty:
         total_invested=saved_df["Amount"].sum()
         avg_rate=saved_df["Rate (%)"].mean()
@@ -274,12 +281,19 @@ if os.path.exists(DATA_FILE):
         if not saved_df.empty:
             del_id=st.selectbox("Select Investment ID to Delete",saved_df["ID"].unique())
             if st.button("Delete Selected Record"):
-                saved_df=saved_df[saved_df["ID"]!=del_id]
-                saved_df.to_csv(DATA_FILE,index=False)
+                conn=sqlite3.connect(DB_FILE)
+                c=conn.cursor()
+                c.execute("DELETE FROM investments WHERE ID = ?",(del_id,))
+                conn.commit()
+                conn.close()
                 st.success(f"Record with ID {del_id} deleted successfully!")
                 st.rerun()
     with col_del2:
         if st.button("Delete All Saved Data"):
-            os.remove(DATA_FILE)
+            conn=sqlite3.connect(DB_FILE)
+            c=conn.cursor()
+            c.execute("DELETE FROM investments")
+            conn.commit()
+            conn.close()
             st.success("All Saved Investments deleted successfully!")
             st.rerun()
