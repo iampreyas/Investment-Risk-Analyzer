@@ -16,6 +16,7 @@ def init_db():
         ID INTEGER,
         Name TEXT,
         Amount REAL,
+        Rate REAL,
         Years INTEGER,
         Volatility REAL
         )
@@ -71,7 +72,7 @@ if save_clicked:
         )
         conn.commit()
         conn.close()
-        st.success(f"Investment '{inv_name}' saved successfully to {DATA_FILE}!")
+        st.success(f"Investment '{inv_name}' saved successfully!")
 if analyze_clicked:
     total= amount * ((1 + rate/100) ** years)
     profit = total - amount
@@ -190,12 +191,12 @@ if analyze_clicked:
     fig.update_layout(yaxis_title="Portfolio Value (Rs.)")
     st.plotly_chart(fig,use_container_width=True)
     conn=sqlite3.connect(DB_FILE)
-    saved_df=pd.read_sql_query("SELECT * FROOM investments",conn)
+    saved_df=pd.read_sql_query("SELECT * FROM investments",conn)
     conn.close()
     if not saved_df.empty:
         total_invested=saved_df["Amount"].sum()
-        avg_rate=saved_df["Rate (%)"].mean()
-        avg_volatility=saved_df["Volatility (%)"].mean() if "Volatility (%)" in saved_df.columns else 0
+        avg_rate=saved_df["Rate"].mean()
+        avg_volatility=saved_df["Volatility"].mean() if "Volatility (%)" in saved_df.columns else 0
         col_m1,col_m2,col_m3,col_m4=st.columns(4)
         with col_m1:
             st.metric(label="Total Invested Amount",value=f"Rs. {total_invested:,.2f}")
