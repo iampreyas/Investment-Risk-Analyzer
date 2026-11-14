@@ -13,7 +13,7 @@ def init_db():
     c=conn.cursor()
     c.execute('''
     CREATE TABLE IF NOT EXISTS investments(
-        ID INTEGER,
+        ID INTEGER PRIMARY KEY AUTOINCREMENT,
         Name TEXT,
         Amount REAL,
         Rate REAL,
@@ -65,10 +65,10 @@ if save_clicked:
         c=conn.cursor()
         c.execute(
             '''
-            INSERT INTO investments (ID, Name, Amount, Rate, Years, Volatility)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO investments (Name, Amount, Rate, Years, Volatility)
+            VALUES (?, ?, ?, ?, ?)
             ''',
-            (inv_id,inv_name,amount,rate,years,volatility)
+            (inv_name,amount,rate,years,volatility)
         )
         conn.commit()
         conn.close()
@@ -264,8 +264,8 @@ if analyze_clicked:
         st.markdown("Risk vs Return Analysis")
         fig_risk=px.scatter(
             saved_df,
-            x="Volatility (%)",
-            y="Rate (%)",
+            x="Volatility",
+            y="Rate",
             size="Amount",
             color="Name",
             hover_data=["ID","Amount"],
@@ -277,11 +277,12 @@ if analyze_clicked:
             yaxis_title="Expected Return (%)"
         )
         st.plotly_chart(fig_risk,use_container_width=True)
-    col_del1,col_del2=st.columns(2)
-    with col_del1:
-        if not saved_df.empty:
-            del_id=st.selectbox("Select Investment ID to Delete",saved_df["ID"].unique())
-            if st.button("Delete Selected Record"):
+    st.markdown("DELETE Investments")
+    if not saved_df.empty:
+        del_id=st.selectbox("Select Investment ID to Delete",saved_df["ID"].unique(),key="del_select")
+        col_del1,col_del2=st.columns(2)
+        with col_del1:
+            if st.button("Delete Selected Record",key="btn_delete_one"):
                 conn=sqlite3.connect(DB_FILE)
                 c=conn.cursor()
                 c.execute("DELETE FROM investments WHERE ID = ?",(del_id,))
@@ -289,12 +290,14 @@ if analyze_clicked:
                 conn.close()
                 st.success(f"Record with ID {del_id} deleted successfully!")
                 st.rerun()
-    with col_del2:
-        if st.button("Delete All Saved Data"):
-            conn=sqlite3.connect(DB_FILE)
-            c=conn.cursor()
-            c.execute("DELETE FROM investments")
-            conn.commit()
-            conn.close()
-            st.success("All Saved Investments deleted successfully!")
-            st.rerun()
+        with col_del2:
+            if st.button("Delete All Saved Data",key="btn_delete_all"):
+                conn=sqlite3.connect(DB_FILE)
+                c=conn.cursor()
+                c.execute("DELETE FROM investments")
+                conn.commit()
+                conn.close()
+                st.success("All Saved Investments deleted successfully!")
+                st.rerun()
+    else:
+        st.info("No investments to delete.")
