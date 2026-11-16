@@ -190,114 +190,114 @@ if analyze_clicked:
     )
     fig.update_layout(yaxis_title="Portfolio Value (Rs.)")
     st.plotly_chart(fig,use_container_width=True)
-    conn=sqlite3.connect(DB_FILE)
-    saved_df=pd.read_sql_query("SELECT * FROM investments",conn)
-    conn.close()
-    if not saved_df.empty:
-        total_invested=saved_df["Amount"].sum()
-        avg_rate=saved_df["Rate"].mean()
-        avg_volatility=saved_df["Volatility"].mean() if "Volatility (%)" in saved_df.columns else 0
-        col_m1,col_m2,col_m3,col_m4=st.columns(4)
-        with col_m1:
-            st.metric(label="Total Invested Amount",value=f"Rs. {total_invested:,.2f}")
-        with col_m2:
-            st.metric(label="Average Return Rate",value=f"{avg_rate:.2f}%")
-        with col_m3:
-            st.metric(label="Average Volatility",value=f"{avg_volatility:.2f}%")
-        with col_m4:
-            st.metric(label="Total Saved Assets",value=len(saved_df))
-    st.markdown("Saved Investments")
-    st.dataframe(saved_df,use_container_width=True)
-    if not saved_df.empty:
-        csv=saved_df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="Download Portfolio as CSV",
-            data=csv,
-            file_name="my_portfolio.csv",
-            mime="text/csv"
-        )
-    st.markdown("Compare Two Investments")
-    if not saved_df.empty and len(saved_df) >= 2:
-        col_c1,col_c2=st.columns(2)
-        with col_c1:
-            inv1=st.selectbox("Select First Investment",saved_df["Name"].unique(),key="comp1")
-        with col_c2:
-            inv2=st.selectbox("Select Second Investment",saved_df["Name"].unique(),key="comp2")
-        if inv1 != inv2:
-            row1=saved_df[saved_df["Name"]==inv1].iloc[0]
-            row2=saved_df[saved_df["Name"]==inv2].iloc[0]
-            def get_final_value(row):
-                return row["Amount"] * ((1 + row["Rate (%)"]/100) ** row["Years"])
-            val1=get_final_value(row1)
-            val2=get_final_value(row2)
-            st.markdown("Comparison Result")
-            comp_col1,comp_col2=st.columns(2)
-            with comp_col1:
-                st.info(f"**{inv1}**")
-                st.write(f"Amount: Rs. {row1['Amount']:,.0f}")
-                st.write(f"Rate: {row1['Rate (%)']}%")
-                st.write(f"Years: {row1['Years']}")
-                st.write(f"Volatility: {row1['Volatility (%)']}%")
-                st.write(f"Final Value: Rs. {val1:,.2f}")
-            with comp_col2:
-                st.info(f"**{inv2}**")
-                st.write(f"Amount: Rs. {row2['Amount']:,.0f}")
-                st.write(f"Rate: {row2['Rate (%)']}%")
-                st.write(f"Years: {row2['Years']}")
-                st.write(f"Volatility: {row2['Volatility (%)']}%")
-                st.write(f"Final Value: Rs. {val2:,.2f}")
-            if val1 > val2:
-                st.success(f"Winner based on Final Value: **{inv1}**")
-            elif val2 > val1:
-                st.success(f"Winner based on Final Value: **{inv2}**")
-            else:
-                st.warning("Both have same Final Value")
+conn=sqlite3.connect(DB_FILE)
+saved_df=pd.read_sql_query("SELECT * FROM investments",conn)
+conn.close()
+if not saved_df.empty:
+    total_invested=saved_df["Amount"].sum()
+    avg_rate=saved_df["Rate"].mean()
+    avg_volatility=saved_df["Volatility"].mean() if "Volatility (%)" in saved_df.columns else 0
+    col_m1,col_m2,col_m3,col_m4=st.columns(4)
+    with col_m1:
+        st.metric(label="Total Invested Amount",value=f"Rs. {total_invested:,.2f}")
+    with col_m2:
+        st.metric(label="Average Return Rate",value=f"{avg_rate:.2f}%")
+    with col_m3:
+        st.metric(label="Average Volatility",value=f"{avg_volatility:.2f}%")
+    with col_m4:
+        st.metric(label="Total Saved Assets",value=len(saved_df))
+st.markdown("Saved Investments")
+st.dataframe(saved_df,use_container_width=True)
+if not saved_df.empty:
+    csv=saved_df.to_csv(index=False).encode('utf-8')
+    st.download_button(
+        label="Download Portfolio as CSV",
+        data=csv,
+        file_name="my_portfolio.csv",
+        mime="text/csv"
+    )
+st.markdown("Compare Two Investments")
+if not saved_df.empty and len(saved_df) >= 2:
+    col_c1,col_c2=st.columns(2)
+    with col_c1:
+        inv1=st.selectbox("Select First Investment",saved_df["Name"].unique(),key="comp1")
+    with col_c2:
+        inv2=st.selectbox("Select Second Investment",saved_df["Name"].unique(),key="comp2")
+    if inv1 != inv2:
+        row1=saved_df[saved_df["Name"]==inv1].iloc[0]
+        row2=saved_df[saved_df["Name"]==inv2].iloc[0]
+        def get_final_value(row):
+            return row["Amount"] * ((1 + row["Rate"]/100) ** row["Years"])
+        val1=get_final_value(row1)
+        val2=get_final_value(row2)
+        st.markdown("Comparison Result")
+        comp_col1,comp_col2=st.columns(2)
+        with comp_col1:
+            st.info(f"**{inv1}**")
+            st.write(f"Amount: Rs. {row1['Amount']:,.0f}")
+            st.write(f"Rate: {row1['Rate']}%")
+            st.write(f"Years: {row1['Years']}")
+            st.write(f"Volatility: {row1['Volatility']}%")
+            st.write(f"Final Value: Rs. {val1:,.2f}")
+        with comp_col2:
+            st.info(f"**{inv2}**")
+            st.write(f"Amount: Rs. {row2['Amount']:,.0f}")
+            st.write(f"Rate: {row2['Rate']}%")
+            st.write(f"Years: {row2['Years']}")
+            st.write(f"Volatility: {row2['Volatility']}%")
+            st.write(f"Final Value: Rs. {val2:,.2f}")
+        if val1 > val2:
+            st.success(f"Winner based on Final Value: **{inv1}**")
+        elif val2 > val1:
+            st.success(f"Winner based on Final Value: **{inv2}**")
         else:
+            st.warning("Both have same Final Value")
+    else:
             st.warning("Please select two different investments")
-    else:
-        st.info("At least 2 investments required for comparison")
-    if not saved_df.empty:
-        st.markdown("Asset Allocation Breakdown")
-        fig_pie=px.pie(saved_df,values="Amount",names="Name",title="Portfolio Asset Allocation by Amount",hole=0.4)
-        fig_pie.update_traces(textinfo='percent+label')
-        st.plotly_chart(fig_pie,use_container_width=True)
-        st.markdown("Risk vs Return Analysis")
-        fig_risk=px.scatter(
-            saved_df,
-            x="Volatility",
-            y="Rate",
-            size="Amount",
-            color="Name",
-            hover_data=["ID","Amount"],
-            title="Investment Risk vs Expected Return",
-            size_max=50
-        )
-        fig_risk.update_layout(
-            xaxis_title="Risk (Volatility %)",
-            yaxis_title="Expected Return (%)"
-        )
-        st.plotly_chart(fig_risk,use_container_width=True)
-    st.markdown("DELETE Investments")
-    if not saved_df.empty:
-        del_id=st.selectbox("Select Investment ID to Delete",saved_df["ID"].unique(),key="del_select")
-        col_del1,col_del2=st.columns(2)
-        with col_del1:
-            if st.button("Delete Selected Record",key="btn_delete_one"):
-                conn=sqlite3.connect(DB_FILE)
-                c=conn.cursor()
-                c.execute("DELETE FROM investments WHERE ID = ?",(del_id,))
-                conn.commit()
-                conn.close()
-                st.success(f"Record with ID {del_id} deleted successfully!")
-                st.rerun()
-        with col_del2:
-            if st.button("Delete All Saved Data",key="btn_delete_all"):
-                conn=sqlite3.connect(DB_FILE)
-                c=conn.cursor()
-                c.execute("DELETE FROM investments")
-                conn.commit()
-                conn.close()
-                st.success("All Saved Investments deleted successfully!")
-                st.rerun()
-    else:
-        st.info("No investments to delete.")
+else:
+    st.info("At least 2 investments required for comparison")
+if not saved_df.empty:
+    st.markdown("Asset Allocation Breakdown")
+    fig_pie=px.pie(saved_df,values="Amount",names="Name",title="Portfolio Asset Allocation by Amount",hole=0.4)
+    fig_pie.update_traces(textinfo='percent+label')
+    st.plotly_chart(fig_pie,use_container_width=True)
+    st.markdown("Risk vs Return Analysis")
+    fig_risk=px.scatter(
+        saved_df,
+        x="Volatility",
+        y="Rate",
+        size="Amount",
+        color="Name",
+        hover_data=["ID","Amount"],
+        title="Investment Risk vs Expected Return",
+        size_max=50
+    )
+    fig_risk.update_layout(
+        xaxis_title="Risk (Volatility %)",
+        yaxis_title="Expected Return (%)"
+    )
+    st.plotly_chart(fig_risk,use_container_width=True)
+st.markdown("DELETE Investments")
+if not saved_df.empty:
+    del_id=st.selectbox("Select Investment ID to Delete",saved_df["ID"].unique(),key="del_select")
+    col_del1,col_del2=st.columns(2)
+    with col_del1:
+        if st.button("Delete Selected Record",key="btn_delete_one"):
+            conn=sqlite3.connect(DB_FILE)
+            c=conn.cursor()
+            c.execute("DELETE FROM investments WHERE ID = ?",(del_id,))
+            conn.commit()
+            conn.close()
+            st.success(f"Record with ID {del_id} deleted successfully!")
+            st.rerun()
+    with col_del2:
+        if st.button("Delete All Saved Data",key="btn_delete_all"):
+            conn=sqlite3.connect(DB_FILE)
+            c=conn.cursor()
+            c.execute("DELETE FROM investments")
+            conn.commit()
+            conn.close()
+            st.success("All Saved Investments deleted successfully!")
+            st.rerun()
+else:
+    st.info("No investments to delete.")
