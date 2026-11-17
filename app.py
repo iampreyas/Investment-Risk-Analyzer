@@ -4,6 +4,7 @@ import plotly.express as px
 import os
 import numpy as np
 import sqlite3
+import yfinance as yf
 st.title ("Investment Risk Analyzer")
 st.subheader("Calculate Return & Analyze Risk")
 DATA_FILE="investments.csv"
@@ -36,6 +37,10 @@ if 'years' not in st.session_state:
     st.session_state.years=5
 if 'volatility' not in st.session_state:
     st.session_state.volatility=5.0
+if 'rate_val' not in st.session_state:
+    st.session_state.rate_val=10.0
+if 'vol_val' not in st.session_state:
+    st.session_state.vol_val=5.0
 def clear_data():
     st.session_state.inv_id=1
     st.session_state.inv_name=""
@@ -46,17 +51,43 @@ def clear_data():
 inv_id =st.number_input("Investment ID", min_value=1,step=1,key='inv_id')
 inv_name=st.text_input("Investment Name", key='inv_name')
 amount=st.number_input("Investment Amount (Rs.)",min_value=0.0,step=5000.0,key='amount')
-rate=st.number_input("Expected Return Rate (%)",min_value=0.0,step=0.5,key='rate')
+rate=st.number_input("Expected Return Rate (%)",min_value=0.0,step=0.5,value=st.session_state.rate_val)
 years = st.slider("Investment Horizon (Years)",min_value=1,max_value=10,key='years')
-volatility=st.number_input("Expected Volatility / Risk (%)",min_value=0.0,step=0.5,key='volatility')
+volatility=st.number_input("Expected Volatility / Risk (%)",min_value=0.0,step=0.5,value=st.session_state.vol_val)
 target=st.number_input("Enter Targeted Amount (Rs.)",min_value=0.0,step=10000.0,value=amount*2)
-col1,col2,col3=st.columns(3)
+col1,col2,col3,col4=st.columns(4)
 with col1:
     analyze_clicked = st.button("Analyze Investment")
 with col2:
     save_clicked=st.button("Save Investment")
 with col3:
     st.button("Clear Data",on_click=clear_data)
+with col4:
+    fetch_clicked=st.button("Fetch Stock Data")
+if fetch_clicked:
+    if inv_name.strip() != "":
+        try:
+            import requests
+            session=requests.Session()
+            session.headers.update({'User-Agent':'Mozilla/5.0'})
+            stock=yf.Ticker(inv_name.strip())
+            df_stock=stock.history(period="1y")
+            if not df_stock.empty:
+                df_stock['Daily Return']=df_stock['Close'].pct_change()
+                mean_daily_return=df_stock['Daily Return'].mean()
+                annual_return=mean_daily_return * 252 * 100
+                daily_volatility=df_stock['Daily Return'].std()
+                annual_volatility=daily_volatility * (252 ** 0.5) * 100
+                st.session_state.rate=round(float(annual_return),2)
+                st.session_state.volatility=round(float(annual_volatility),2)
+                st.success(f"Fetched 1-year data for {inv_name.upper()} successfully!")
+                st.rerun()
+            else:
+                st.error("No historical data found for this ticker.")
+        except Exception as e:
+            st.error(f"Error fetching data: {e}")
+    else:
+        st.warning("Please enter a stock ticker in 'Investment Name' first")
 if save_clicked:
     if inv_name.strip()=="":
         st.error("Please enter a valid Investment Name before saving.")
@@ -196,7 +227,7 @@ conn.close()
 if not saved_df.empty:
     total_invested=saved_df["Amount"].sum()
     avg_rate=saved_df["Rate"].mean()
-    avg_volatility=saved_df["Volatility"].mean() if "Volatility (%)" in saved_df.columns else 0
+    avg_volatility=saved_df["Volatility"].mean()
     col_m1,col_m2,col_m3,col_m4=st.columns(4)
     with col_m1:
         st.metric(label="Total Invested Amount",value=f"Rs. {total_invested:,.2f}")
