@@ -51,7 +51,7 @@ def clear_data():
 inv_id =st.number_input("Investment ID", min_value=1,step=1,key='inv_id')
 inv_name=st.text_input("Investment Name", key='inv_name')
 amount=st.number_input("Investment Amount (Rs.)",min_value=0.0,step=5000.0,key='amount')
-rate=st.number_input("Expected Return Rate (%)",min_value=0.0,step=0.5,value=st.session_state.rate_val)
+rate=st.number_input("Expected Return Rate (%)",min_value=-100.0,step=0.5,value=st.session_state.rate_val)
 years = st.slider("Investment Horizon (Years)",min_value=1,max_value=10,key='years')
 volatility=st.number_input("Expected Volatility / Risk (%)",min_value=0.0,step=0.5,value=st.session_state.vol_val)
 target=st.number_input("Enter Targeted Amount (Rs.)",min_value=0.0,step=10000.0,value=amount*2)
@@ -78,8 +78,8 @@ if fetch_clicked:
                 annual_return=mean_daily_return * 252 * 100
                 daily_volatility=df_stock['Daily Return'].std()
                 annual_volatility=daily_volatility * (252 ** 0.5) * 100
-                st.session_state.rate=round(float(annual_return),2)
-                st.session_state.volatility=round(float(annual_volatility),2)
+                st.session_state.rate_val=round(float(annual_return),2)
+                st.session_state.vol_val=round(float(annual_volatility),2)
                 st.success(f"Fetched 1-year data for {inv_name.upper()} successfully!")
                 st.rerun()
             else:
