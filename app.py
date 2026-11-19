@@ -161,6 +161,19 @@ if analyze_clicked:
         st.warning(f"Risk Score: {risk_score:.1f}/100 -> Medium Risk")
     else:
         st.warning(f"Risk Score: {risk_score:.1f}/100 -> low Risk")
+    risk_free_rate=6.5
+    if volatility > 0:
+        sharp_ratio=(rate - risk_free_rate)
+    else:
+        sharp_ratio=0
+    st.markdown("Sharp Ratio")
+    st.metric("Sharp Ratio",f"{sharp_ratio:.2f}")
+    if sharp_ratio > 1:
+        st.success("Good risk-adjusted return")
+    elif sharp_ratio > 0.5:
+        st.info("Average risk-adjusted return")
+    else:
+        st.warning("Low risk-adjusted return")
     st.markdown("Posible Future Results")
     np.random.seed(42)
     simulations=1000
