@@ -163,7 +163,7 @@ if analyze_clicked:
         st.warning(f"Risk Score: {risk_score:.1f}/100 -> low Risk")
     risk_free_rate=6.5
     if volatility > 0:
-        sharp_ratio=(rate - risk_free_rate)
+        sharp_ratio=(rate - risk_free_rate) / volatility
     else:
         sharp_ratio=0
     st.markdown("Sharp Ratio")
@@ -174,6 +174,25 @@ if analyze_clicked:
         st.info("Average risk-adjusted return")
     else:
         st.warning("Low risk-adjusted return")
+    peak=amount
+    max_dd=0
+    curr=amount
+    downside_rate=rate-volatility
+    for y in range(1,years + 1):
+        curr=curr*(1 + downside_rate /100)
+        if curr > peak:
+            peak=curr
+        dd=(peak-curr)/peak*100 if peak > 0 else 0
+        if dd > max_dd:
+            max_dd=dd
+    st.markdown("Max Dropdown")
+    st.metric("Max Dropdown",f"{max_dd:.2f}%")
+    if max_dd < 10:
+        st.success("stable")
+    elif max_dd < 25:
+        st.warning("Moderate Drawdown")
+    else:
+        st.error("Risky")
     st.markdown("Posible Future Results")
     np.random.seed(42)
     simulations=1000
