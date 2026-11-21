@@ -224,6 +224,15 @@ if analyze_clicked:
     )
     fig_hist.update_layout(showlegend=False)
     st.plotly_chart(fig_hist,use_container_width=True)
+    shortfall_from_avg=max(0.0,avg_sim - worst_5)
+    shortfall_pct=(shortfall_from_avg/avg_sim*100) if avg_sim > 0 else 0.0
+    st.markdown("Worst-Case Spread (5%)")
+    st.metric(
+        label="Gap Below Average Outcome",
+        value=f"Rs. {shortfall_from_avg:,.0f}",
+        delta=f"-{shortfall_pct:.1f}% vs avg",
+        delta_color="inverse"
+    )
     st.markdown("Target Amount Checker")
     if target > 0:
         prob_target=(np.sum(final_values >= target) /simulations) * 100
